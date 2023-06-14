@@ -14,8 +14,8 @@ contract SimpleLottery is Ownable {
     struct Lottery {
         uint256 id;
         uint256 maxParticipants;
-        uint256 ticketPrice;        // Price is in erc20 token.
-        uint256 winningAmount;      // winner will get erc20 token
+        uint256 ticketPrice;        
+        uint256 winningAmount;      
         LotteryStatus status;
         string winnerTicketId; 
         uint256 ticketsSold;       // number of tickets sold
