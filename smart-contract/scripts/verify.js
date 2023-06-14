@@ -8,17 +8,8 @@ const hre = require('hardhat');
 const ethers = hre.ethers;
 
 async function main() {
-  const simepleLotteryFactory = await ethers.getContractFactory("SimpleLottery");
-  const contract = await simepleLotteryFactory.deploy([]);
-  console.log(
-    `Simple Lottery deployed to ${contract.target}`
-  );
-
-  await contract.deploymentTransaction().wait(6);
-
-  console.log(`Verifying contract on etherscan`);
-  await verify(contract.target, []);
-  console.log('Deployment complete');
+  await verify('0x9f2c096005575050BB250dd665617E7517374c78', []);
+  console.log('Verification complete');
 }
 
 const verify = async (contractAddress, args) => {
@@ -37,8 +28,6 @@ const verify = async (contractAddress, args) => {
   }
 };
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
