@@ -124,7 +124,7 @@ contract SimpleLottery is Ownable {
 
     modifier isLotteryFull {
         Lottery memory lottery = lotteryMap[currentLotteryId];
-        require(lottery.status == LotteryStatus.CLOSED, "Lottery is not full!");
+        require(lottery.status == LotteryStatus.CLOSED, "Lottery has not started OR is not full OR winner is already declared!");
         _;
     }
 
