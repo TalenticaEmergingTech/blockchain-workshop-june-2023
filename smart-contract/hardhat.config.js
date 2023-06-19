@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dotenv = require("dotenv");
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '/.env') });
+require('dotenv').config();
 const { SEPOLIA_ALCHEMY_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
