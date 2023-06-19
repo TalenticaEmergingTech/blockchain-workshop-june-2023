@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dotenv = require("dotenv");
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '/.env') });
+require('dotenv').config();
 const { SEPOLIA_ALCHEMY_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -11,11 +11,11 @@ module.exports = {
     hardhat: {
     },
     sepolia: {
-      url: SEPOLIA_ALCHEMY_URL,
-      accounts: [PRIVATE_KEY]
+      url: SEPOLIA_ALCHEMY_URL || "https://eth-sepolia.g.alchemy.com/v2/",
+      accounts: [PRIVATE_KEY || "0000000000000000000000000000000000000000000000000000000000000000"]
     }
   },
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
+    apiKey: ETHERSCAN_API_KEY || "0000000000000000000000000000000000",
   },
 };

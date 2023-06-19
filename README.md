@@ -10,4 +10,4 @@ This project is created for the blockchain workshop scheduled in june 2023. This
 
 The structure of ths repo is such that we can add frontend and subgraph modules as well.
 
-Refer [setup.sh](setup.sh) for the project setup/
+Refer [setup.sh](setup.sh) for the project setup.
