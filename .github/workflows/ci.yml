@@ -20,5 +20,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
 
+      - name: Install dependencies
+        run: npm install
+        working-directory: smart-contract
+
       - name: Run tests
-        run: npx hardhat test ./smart-contract/test/*.js
+        working-directory: smart-contract
+        run: npx hardhat test
