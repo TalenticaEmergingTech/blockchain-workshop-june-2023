@@ -16,8 +16,8 @@ async function main() {
 
   await contract.deploymentTransaction().wait(6);
 
-  console.log(`Verifying contract on etherscan`);
-  await verify(contract.target, []);
+  /* console.log(`Verifying contract on etherscan`);
+  await verify(contract.target, []); */
   console.log('Deployment complete');
 }
 
