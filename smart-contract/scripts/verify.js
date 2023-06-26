@@ -8,7 +8,7 @@ const hre = require('hardhat');
 const ethers = hre.ethers;
 
 async function main() {
-  await verify('0x9f2c096005575050BB250dd665617E7517374c78', []);
+  await verify('0x93c362Cdf3b285443F7E739607703d8527363C89', []);
   console.log('Verification complete');
 }
 
