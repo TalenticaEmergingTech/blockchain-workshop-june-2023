@@ -60,6 +60,14 @@ contract SimpleLottery is Ownable {
     // Owner should be able to start a lottery if there is no actively running lottery. 
     // Also, should be able to start a new lottery is the previous lottery winner has been declared.  
     function start(uint256 _maxParticipants, uint256 _ticketPrice, uint256 _winningAmount) public returns (uint256 lotteryId) {
+        /*
+         * 1.  Check that the caller of the function is the contract owner by using the onlyOwner modifier. 
+         * 2.  Increment the currentLotteryId variable to generate a new unique ID for the upcoming lottery.
+         * 3.  Create a new Lottery struct with all the properties:
+         * 4.  Store the newly created lottery in the lotteryMap mapping, using the current lottery ID as the key.
+         * 5.  Emit the LotteryStarted event with the following parameters: current lottery ID, maximum number of participants, ticket price, and winning amount.
+         * 6.  Return the current lottery ID.
+         */
         return 0;
     }
 
@@ -67,14 +75,36 @@ contract SimpleLottery is Ownable {
     // The msg.value should equal the price of the ticket.
     // Buyer will get a ticket id.
     function buy() public returns (string memory ticketId) {
-        // TODO: Implement this function
+        /*
+         * 1.  Use "canStart" modifier to validate the lottery status.
+         * 2.  Ensure that the value sent with the transaction matches the ticket price specified in the lottery. If not, revert the transaction with an error message.
+         * 3.  Increment the ticketsSold count of the current lottery.
+         * 4.  If the number of tickets sold is equal to the maximum number of participants allowed in the lottery, set the lottery status to LotteryStatus.CLOSED.
+         * 5.  Generate a unique ticket ID for the current ticket by calling the getTicketId function.
+         * 6.  Create a new Ticket struct with the generated ticket ID, current lottery ID, and the address of the buyer (msg.sender).
+         * 7.  Store the new ticket in the ticketMap mapping using the ticket ID as the key.
+         * 8.  Emit the TicketBought event with the current lottery ID, the generated ticket ID, and the address of the buyer.
+         * 9.  Return the generated ticket ID. 
+        */
         return "";
     }
 
     // Owner can declare the winner if the lottery has reached the required number of participants
     // Transfer the winning amount to the ticket owner
     function declareWinner() public returns (string memory winnerTicketId) {
-        // TODO: Implement this function
+        /**
+         * 1.  Check that the caller of the function is the contract owner by using the onlyOwner modifier.
+         * 2.  Retrieve the current lottery using the currentLotteryId.
+         * 3.  To get a random winner, Call the getRandomNumber function with the maximum number of participants of the lottery as the parameter.
+         * 4.  Increment the randomly generated winning ticket number by 1 to match the range of ticket numbers (which starts from 1).
+         * 5.  Get the ticket ID corresponding to the winning ticket number by calling the getTicketId function with the winning ticket number and the current lottery ID as parameters.
+         * 6.  Set the winnerTicketId property of the current lottery to the generated winning ticket ID.
+         * 7.  Set the status of the current lottery to LotteryStatus.WINNER_DECLARED to indicate that a winner has been declared.
+         * 8.  Retrieve the address of the winner from the ticketMap using the winnerTicketId.
+         * 9.  Emit the WinnerDeclared event with the following parameters: current lottery ID, winning ticket ID, address of the winner, and the winning amount.
+         * 10. Transfer the winning amount to the winner's address using the transfer function and the payable keyword.
+         * 11. Return the winning ticket ID.
+         */
         return "";
     }
 
@@ -102,11 +132,7 @@ contract SimpleLottery is Ownable {
         _;
     }
 
-    modifier buyAllowed {
-        Lottery memory lottery = lotteryMap[currentLotteryId];
-        require(lottery.status == LotteryStatus.STARTED, "Cannot buy ticket now as the lottery is not open");
-        _;
-    }
+    // TODO: Write buyAllowed modifier
 
     modifier isLotteryFull {
         Lottery memory lottery = lotteryMap[currentLotteryId];
