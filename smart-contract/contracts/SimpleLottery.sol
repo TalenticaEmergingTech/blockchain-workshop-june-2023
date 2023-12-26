@@ -36,12 +36,11 @@ contract SimpleLottery is Ownable {
 
 
     uint256 public currentLotteryId;
-    mapping(uint256 => Lottery) public lotteryMap;
-    mapping(string => Ticket) public ticketMap;
+    mapping(uint256 => Lottery) private lotteryMap;
+    mapping(string => Ticket) private ticketMap;
     uint256 private seed;
 
     constructor() {
-        currentLotteryId = 0;
         seed = (block.timestamp + block.prevrandao) % 100;
     }
 
@@ -68,7 +67,7 @@ contract SimpleLottery is Ownable {
         return currentLotteryId;
     }
 
-    function buy() public payable buyAllowed returns (string memory ticketId) {
+    function buy() external payable buyAllowed returns (string memory ticketId) {
         // validate lottery is active
         Lottery storage lottery = lotteryMap[currentLotteryId];
         require(msg.value == lottery.ticketPrice, "Value does not equals the ticket price");
@@ -89,7 +88,7 @@ contract SimpleLottery is Ownable {
         return string.concat(Strings.toString(currentLotteryId) , "_", Strings.toString(_ticketNo));
     }
 
-    function declareWinner() public onlyOwner isLotteryFull returns (string memory winner) {
+    function declareWinner() external onlyOwner isLotteryFull returns (string memory winner) {
         Lottery storage lottery = lotteryMap[currentLotteryId];
         uint256 winnerTicketNo = getRandomNumber(lottery.maxParticipants) + 1;
         lottery.winnerTicketId = getTicketId(winnerTicketNo);
@@ -106,8 +105,27 @@ contract SimpleLottery is Ownable {
         return seed;
     }
 
-    function getBalance() public view returns (uint256) {
+    function getBalance() external view returns (uint256) {
         return address(this).balance;
+    }
+
+    function getLotteryDetails(uint256 _lotteryId) external view returns(uint256 id, uint256 maxParticipants, uint256 ticketPrice, 
+        uint256 winningAmount, string memory status, string memory winnerTicketId,uint256 ticketsSold) {
+        Lottery memory lottery = lotteryMap[_lotteryId];
+        return (lottery.id, lottery.maxParticipants, lottery.ticketPrice, lottery.winningAmount, getStatusString(lottery.status), lottery.winnerTicketId, lottery.ticketsSold);
+    }
+
+    function getTicketDetails(string calldata _ticketId) external view returns(string memory id,uint256 lotteryId,address owner) {
+        Ticket memory ticket = ticketMap[_ticketId];
+        return (ticket.id, ticket.lotteryId, ticket.owner);
+    }
+
+    function getStatusString(LotteryStatus _status) private pure returns(string memory) {
+        if (_status == LotteryStatus.NOT_STARTED) return "NOT_STARTED";
+        if (_status == LotteryStatus.STARTED) return "STARTED";
+        if (_status == LotteryStatus.WINNER_DECLARED) return "WINNER_DECLARED";
+        if (_status == LotteryStatus.CLOSED) return "CLOSED";
+        return "";
     }
 
     modifier canStart {
