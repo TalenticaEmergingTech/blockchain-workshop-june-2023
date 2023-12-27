@@ -3,27 +3,28 @@ import simpleLotteryAbi from "../assets/simple-lottery-abi.json";
 import { BrowserProvider } from "ethers";
 
 export class ContractServiceFactory {
-  static instance: ContractService;
-  static getInstance() {
-    if (!ContractServiceFactory.instance) {
-      ContractServiceFactory.instance = new ContractService();
+    static instance: ContractService;
+    static getInstance() {
+        if (!ContractServiceFactory.instance) {
+            ContractServiceFactory.instance = new ContractService();
+        }
+        return ContractServiceFactory.instance;
     }
-    return ContractServiceFactory.instance;
-  }
 }
 
 class ContractService {
-  writeAccessProvider!: BrowserProvider;
-  // Can be used for read only operations as we are not connecting to the wallet
-  readOnlyProvider: JsonRpcProvider;
-  signer!: ethers.JsonRpcSigner;
-  walletAddress!: string;
-  walletBalance!: string;
-  readOnlyContractInstance: Contract;
-  writeAccessContractInstance!: Contract;
-  simpleLotteryContractAddress = "0xB6366e8a0D37C3B090523B8317fB992f48E446DF";
+    writeAccessProvider!: BrowserProvider;
+    // Can be used for read only operations as we are not connecting to the wallet
+    readOnlyProvider: JsonRpcProvider;
+    signer!: ethers.JsonRpcSigner;
+    walletAddress!: string;
+    walletBalance!: string;
+    readOnlyContractInstance: Contract;
+    writeAccessContractInstance!: Contract;
+    simpleLotteryContractAddress = import.meta.env
+        .VITE_LOTTERY_CONTRACT_ADDRESS;
 
-  /*  Lottery =
+    /*  Lottery =
     "(uint256 id, uint256 maxParticipants, uint256 ticketPrice, uint256 winningAmount, string memory status, string winnerTicketId, uint256 ticketsSold)";
   simpleLotteryAbi = [
     "function start(uint256 _maxParticipants, uint256 _ticketPrice, uint256 _winningAmount) public returns (uint256)",
@@ -34,128 +35,134 @@ class ContractService {
     "function currentLotteryId() public view returns (uint256)",
     `function getLotteryDetails(uint256 _lotteryId) public view returns(${this.Lottery} lottery)`,
   ]; */
-  constructor() {
-    this.readOnlyProvider = new ethers.JsonRpcProvider(
-      "https://polygon-mumbai.infura.io/v3/12767fe463ba4c649c1f4e9c1bc0a90d",
-      { chainId: 80001, name: "mumbai" },
-      { staticNetwork: true }
-    );
-
-    this.readOnlyContractInstance = new Contract(
-      this.simpleLotteryContractAddress,
-      simpleLotteryAbi,
-      this.readOnlyProvider
-    );
-  }
-
-  async getSigner() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.signer;
-  }
-
-  async getWriteAccessProvider() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.signer?.provider;
-  }
-
-  async connectWallet() {
-    if (window.ethereum == null) {
-      console.log("MetaMask not installed;");
-    } else {
-      try {
-        this.writeAccessProvider = new ethers.BrowserProvider(window.ethereum);
-        this.signer = await this.writeAccessProvider.getSigner();
-
-        this.walletAddress = await this.signer.getAddress();
-        const bal = await this.signer.provider.getBalance(
-          await this.signer.getAddress()
+    constructor() {
+        this.readOnlyProvider = new ethers.JsonRpcProvider(
+            "https://polygon-mumbai.infura.io/v3/12767fe463ba4c649c1f4e9c1bc0a90d",
+            { chainId: 80001, name: "mumbai" },
+            { staticNetwork: true }
         );
-        this.writeAccessContractInstance = new Contract(
-          this.simpleLotteryContractAddress,
-          simpleLotteryAbi,
-          this.signer
+
+        this.readOnlyContractInstance = new Contract(
+            this.simpleLotteryContractAddress,
+            simpleLotteryAbi,
+            this.readOnlyProvider
         );
-        const balEth = ethers.formatUnits(bal, "ether");
-        this.walletBalance = balEth.toString() + " MATIC";
-      } catch (error) {
-        console.log(error);
-      }
     }
-  }
 
-  async getWalletAddress() {
-    if (!this.signer) {
-      await this.connectWallet();
+    async getSigner() {
+        if (!this.signer) {
+            await this.connectWallet();
+        }
+        return this.signer;
     }
-    return this.walletAddress;
-  }
 
-  async getWalletBalance() {
-    if (!this.signer) {
-      await this.connectWallet();
+    async getWriteAccessProvider() {
+        if (!this.signer) {
+            await this.connectWallet();
+        }
+        return this.signer?.provider;
     }
-    return this.walletBalance;
-  }
 
-  isWalletConnected() {
-    return this.walletAddress !== undefined && this.walletAddress.length > 0;
-  }
+    async connectWallet() {
+        if (window.ethereum == null) {
+            console.log("MetaMask not installed;");
+        } else {
+            try {
+                this.writeAccessProvider = new ethers.BrowserProvider(
+                    window.ethereum
+                );
+                this.signer = await this.writeAccessProvider.getSigner();
 
-  async getLotteryId() {
-    const currentLotteryId =
-      await this.readOnlyContractInstance.currentLotteryId();
-    return currentLotteryId.toString();
-  }
-
-  async getCurrentLotteryDetails() {
-    const lotteryDetails =
-      await this.readOnlyContractInstance.getLotteryDetails(
-        await this.getLotteryId()
-      );
-    return lotteryDetails;
-  }
-
-  async startLottery(
-    maxParticipants: number,
-    ticketPrice: number | bigint,
-    winningAmount: number | bigint
-  ) {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
+                this.walletAddress = await this.signer.getAddress();
+                const bal = await this.signer.provider.getBalance(
+                    await this.signer.getAddress()
+                );
+                this.writeAccessContractInstance = new Contract(
+                    this.simpleLotteryContractAddress,
+                    simpleLotteryAbi,
+                    this.signer
+                );
+                const balEth = ethers.formatUnits(bal, "ether");
+                this.walletBalance = balEth.toString() + " MATIC";
+            } catch (error) {
+                console.log(error);
+            }
+        }
     }
-    await this.writeAccessContractInstance.start(
-      maxParticipants,
-      ticketPrice,
-      winningAmount
-    );
-  }
 
-  async buyTicket(ticketPrice: number) {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
+    async getWalletAddress() {
+        if (!this.signer) {
+            await this.connectWallet();
+        }
+        return this.walletAddress;
     }
-    await this.writeAccessContractInstance.buy({
-      value: ticketPrice,
-      gasLimit: 300000,
-    });
-  }
 
-  async getOwner() {
-    return await this.readOnlyContractInstance.owner();
-  }
-
-  async delcareWinner() {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
+    async getWalletBalance() {
+        if (!this.signer) {
+            await this.connectWallet();
+        }
+        return this.walletBalance;
     }
-    await this.writeAccessContractInstance.declareWinner({ gasLimit: 300000 });
-  }
 
-  async getTicketDetails(ticketId: string) {
-    return await this.readOnlyContractInstance.getTicketDetails(ticketId);
-  }
+    isWalletConnected() {
+        return (
+            this.walletAddress !== undefined && this.walletAddress.length > 0
+        );
+    }
+
+    async getLotteryId() {
+        const currentLotteryId =
+            await this.readOnlyContractInstance.currentLotteryId();
+        return currentLotteryId.toString();
+    }
+
+    async getCurrentLotteryDetails() {
+        const lotteryDetails =
+            await this.readOnlyContractInstance.getLotteryDetails(
+                await this.getLotteryId()
+            );
+        return lotteryDetails;
+    }
+
+    async startLottery(
+        maxParticipants: number,
+        ticketPrice: number | bigint,
+        winningAmount: number | bigint
+    ) {
+        if (!this.writeAccessProvider) {
+            await this.connectWallet();
+        }
+        await this.writeAccessContractInstance.start(
+            maxParticipants,
+            ticketPrice,
+            winningAmount
+        );
+    }
+
+    async buyTicket(ticketPrice: number) {
+        if (!this.writeAccessProvider) {
+            await this.connectWallet();
+        }
+        await this.writeAccessContractInstance.buy({
+            value: ticketPrice,
+            gasLimit: 300000,
+        });
+    }
+
+    async getOwner() {
+        return await this.readOnlyContractInstance.owner();
+    }
+
+    async delcareWinner() {
+        if (!this.writeAccessProvider) {
+            await this.connectWallet();
+        }
+        await this.writeAccessContractInstance.declareWinner({
+            gasLimit: 300000,
+        });
+    }
+
+    async getTicketDetails(ticketId: string) {
+        return await this.readOnlyContractInstance.getTicketDetails(ticketId);
+    }
 }
