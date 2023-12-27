@@ -1,5 +1,4 @@
 import { Contract, JsonRpcProvider, ethers } from "ethers";
-import simpleLotteryAbi from "../assets/simple-lottery-abi.json";
 import { BrowserProvider } from "ethers";
 
 export class ContractServiceFactory {
@@ -35,88 +34,42 @@ class ContractService {
     `function getLotteryDetails(uint256 _lotteryId) public view returns(${this.Lottery} lottery)`,
   ]; */
   constructor() {
-    this.readOnlyProvider = new ethers.JsonRpcProvider(
-      "https://polygon-mumbai.infura.io/v3/12767fe463ba4c649c1f4e9c1bc0a90d",
-      { chainId: 80001, name: "mumbai" },
-      { staticNetwork: true }
-    );
-
-    this.readOnlyContractInstance = new Contract(
-      this.simpleLotteryContractAddress,
-      simpleLotteryAbi,
-      this.readOnlyProvider
-    );
+    // Create read only provider. Use infura - https://polygon-mumbai.infura.io/v3/12767fe463ba4c649c1f4e9c1bc0a90d
+    // Connect to polygon mumbai
   }
 
   async getSigner() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.signer;
+    // Get the signer. Signer has access to do write operations. So, you need to connect the metamask wallet to get the signer
   }
 
   async getWriteAccessProvider() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.signer?.provider;
+    // Get the provider from the metamask connection
   }
 
   async connectWallet() {
-    if (window.ethereum == null) {
-      console.log("MetaMask not installed;");
-    } else {
-      try {
-        this.writeAccessProvider = new ethers.BrowserProvider(window.ethereum);
-        this.signer = await this.writeAccessProvider.getSigner();
-
-        this.walletAddress = await this.signer.getAddress();
-        const bal = await this.signer.provider.getBalance(
-          await this.signer.getAddress()
-        );
-        this.writeAccessContractInstance = new Contract(
-          this.simpleLotteryContractAddress,
-          simpleLotteryAbi,
-          this.signer
-        );
-        const balEth = ethers.formatUnits(bal, "ether");
-        this.walletBalance = balEth.toString() + " MATIC";
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    // Connect to metamask and get the provider and signer. Provider and signer are required to interact with the smart contract.
   }
 
   async getWalletAddress() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.walletAddress;
+    // Get connected wallet address
   }
 
   async getWalletBalance() {
-    if (!this.signer) {
-      await this.connectWallet();
-    }
-    return this.walletBalance;
+    // Get connected wallet balance
   }
 
   isWalletConnected() {
-    return this.walletAddress !== undefined && this.walletAddress.length > 0;
+    // check if wallet is connected
   }
 
   async getLotteryId() {
-    const currentLotteryId =
-      await this.readOnlyContractInstance.currentLotteryId();
-    return currentLotteryId.toString();
+    // Get current lottery id. Use the read only contract instance
+    // as fetching the current lottery id is a read operation which can be done without connecting the wallet
   }
 
   async getCurrentLotteryDetails() {
-    const lotteryDetails =
-      await this.readOnlyContractInstance.getLotteryDetails(
-        await this.getLotteryId()
-      );
-    return lotteryDetails;
+    // Get current lottery details. Use the read only contract instance
+    // as fetching the current lottery details is a read operation which can be done without connecting the wallet
   }
 
   async startLottery(
@@ -124,38 +77,22 @@ class ContractService {
     ticketPrice: number | bigint,
     winningAmount: number | bigint
   ) {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
-    }
-    await this.writeAccessContractInstance.start(
-      maxParticipants,
-      ticketPrice,
-      winningAmount
-    );
+    // Starting the lottery is a write operation. So, make sure the metamask wallet is connected.
   }
 
   async buyTicket(ticketPrice: number) {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
-    }
-    await this.writeAccessContractInstance.buy({
-      value: ticketPrice,
-      gasLimit: 300000,
-    });
+    // Buying a lottery ticket is a write operation. So, make sure the metamask wallet is connected.
   }
 
   async getOwner() {
-    return await this.readOnlyContractInstance.owner();
+    // Get the contract owner
   }
 
   async delcareWinner() {
-    if (!this.writeAccessProvider) {
-      await this.connectWallet();
-    }
-    await this.writeAccessContractInstance.declareWinner({ gasLimit: 300000 });
+    // Declaring the lottery winner is a write operation. So, make sure the metamask wallet is connected.
   }
 
   async getTicketDetails(ticketId: string) {
-    return await this.readOnlyContractInstance.getTicketDetails(ticketId);
+    // Read operation. Get ticket details.
   }
 }
