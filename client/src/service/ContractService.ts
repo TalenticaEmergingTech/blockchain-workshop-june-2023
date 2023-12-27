@@ -21,7 +21,7 @@ class ContractService {
   walletBalance!: string;
   readOnlyContractInstance: Contract;
   writeAccessContractInstance!: Contract;
-  simpleLotteryContractAddress = "0x2Db91Ea6fC4CE315581b0054668Da20E13f649E7";
+  simpleLotteryContractAddress = "0xB6366e8a0D37C3B090523B8317fB992f48E446DF";
 
   /*  Lottery =
     "(uint256 id, uint256 maxParticipants, uint256 ticketPrice, uint256 winningAmount, string memory status, string winnerTicketId, uint256 ticketsSold)";
@@ -138,7 +138,10 @@ class ContractService {
     if (!this.writeAccessProvider) {
       await this.connectWallet();
     }
-    await this.writeAccessContractInstance.buy({ value: ticketPrice });
+    await this.writeAccessContractInstance.buy({
+      value: ticketPrice,
+      gasLimit: 300000,
+    });
   }
 
   async getOwner() {
@@ -149,7 +152,7 @@ class ContractService {
     if (!this.writeAccessProvider) {
       await this.connectWallet();
     }
-    await this.writeAccessContractInstance.declareWinner({});
+    await this.writeAccessContractInstance.declareWinner({ gasLimit: 300000 });
   }
 
   async getTicketDetails(ticketId: string) {
