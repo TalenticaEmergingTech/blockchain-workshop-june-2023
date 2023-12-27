@@ -128,6 +128,8 @@ contract SimpleLottery is Ownable {
         return "";
     }
 
+    receive() external payable {}
+
     modifier canStart {
         Lottery memory lottery = lotteryMap[currentLotteryId];
         require(lottery.status == LotteryStatus.NOT_STARTED || lottery.status == LotteryStatus.WINNER_DECLARED, "The last lottery has not ended yet!");
