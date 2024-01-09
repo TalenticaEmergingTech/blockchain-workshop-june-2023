@@ -1,30 +1,31 @@
-# React + TypeScript + Vite
+# Prerequisite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+-   Node v16+​
+-   yarn or npm​
+-   Metamask - https://metamask.io/download/​
+-   Polygon Mumbai Faucet - https://mumbaifaucet.com/ (Login with Alchemy)
 
-Currently, two official plugins are available:
+## Lottery Contract
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Address - 0x6b4f9aDBdf5d41DFE0f9C2D3d9F72B1110D6E5ad
 
-## Expanding the ESLint configuration
+Polygonscan - https://mumbai.polygonscan.com/address/0x6b4f9aDBdf5d41DFE0f9C2D3d9F72B1110D6E5ad
+​
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+# Steps
 
-- Configure the top-level `parserOptions` property like this:
+Add contract address in .env file
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```
+VITE_LOTTERY_CONTRACT_ADDRESS=
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Running the app
+
+```
+yarn install​
+
+checkout branch – react-ui-incomplete​
+
+yarn run dev​
+```
