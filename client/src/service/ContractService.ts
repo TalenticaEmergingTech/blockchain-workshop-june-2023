@@ -14,11 +14,11 @@ export class ContractServiceFactory {
 class ContractService {
     writeAccessProvider!: BrowserProvider;
     // Can be used for read only operations as we are not connecting to the wallet
-    readOnlyProvider: JsonRpcProvider;
+    readOnlyProvider!: JsonRpcProvider;
     signer!: ethers.JsonRpcSigner;
     walletAddress!: string;
     walletBalance!: string;
-    readOnlyContractInstance: Contract;
+    readOnlyContractInstance!: Contract;
     writeAccessContractInstance!: Contract;
     simpleLotteryContractAddress = import.meta.env
         .VITE_LOTTERY_CONTRACT_ADDRESS;
@@ -39,6 +39,35 @@ class ContractService {
         // Connect to polygon mumbai
     }
 
+    async getCurrentLotteryDetails() {
+        // Get current lottery details. Use the read only contract instance
+        // as fetching the current lottery details is a read operation which can be done without connecting the wallet
+        return {
+            id: "",
+            maxParticipants: 0,
+            ticketPrice: 0,
+            winningAmount: 0,
+            status: "",
+            winnerTicketId: "",
+            ticketsSold: "",
+        } as any;
+    }
+
+    async getLotteryId() {
+        // Get current lottery id. Use the read only contract instance
+        // as fetching the current lottery id is a read operation which can be done without connecting the wallet
+    }
+
+    async getOwner() {
+        // Get the contract owner
+        return "";
+    }
+
+    async getTicketDetails(ticketId: string) {
+        // Read operation. Get ticket details.
+        return {} as any;
+    }
+
     async getSigner() {
         // Get the signer. Signer has access to do write operations. So, you need to connect the metamask wallet to get the signer
     }
@@ -53,24 +82,17 @@ class ContractService {
 
     async getWalletAddress() {
         // Get connected wallet address
+        return "";
     }
 
     async getWalletBalance() {
         // Get connected wallet balance
+        return "0";
     }
 
     isWalletConnected() {
         // check if wallet is connected
-    }
-
-    async getLotteryId() {
-        // Get current lottery id. Use the read only contract instance
-        // as fetching the current lottery id is a read operation which can be done without connecting the wallet
-    }
-
-    async getCurrentLotteryDetails() {
-        // Get current lottery details. Use the read only contract instance
-        // as fetching the current lottery details is a read operation which can be done without connecting the wallet
+        return false;
     }
 
     async startLottery(
@@ -85,15 +107,7 @@ class ContractService {
         // Buying a lottery ticket is a write operation. So, make sure the metamask wallet is connected.
     }
 
-    async getOwner() {
-        // Get the contract owner
-    }
-
     async delcareWinner() {
         // Declaring the lottery winner is a write operation. So, make sure the metamask wallet is connected.
-    }
-
-    async getTicketDetails(ticketId: string) {
-        // Read operation. Get ticket details.
     }
 }
