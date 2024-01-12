@@ -133,7 +133,7 @@ function App() {
         </div>
       </header>
       <div className="divide-y-4 divide-slate-400/25 m-8">
-        {lotteryDetails && (
+        {lotteryDetails && lotteryDetails?.id !== undefined && (
           <div className="space-y-4  mx-8">
             <div className="space-y-2">
               {/* Current Lottery Details Section */}
@@ -284,7 +284,7 @@ function App() {
           {ticketDetails && (
             <div>
               <p>Ticket Id: {ticketDetails?.id}</p>
-              <p>Lottery Id: {ticketDetails?.lotteryId.toString()}</p>
+              <p>Lottery Id: {ticketDetails?.lotteryId?.toString()}</p>
               <p>Owner: {ticketDetails?.owner}</p>
             </div>
           )}
